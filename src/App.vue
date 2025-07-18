@@ -1,30 +1,21 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
-</template>
+  <div class="min-h-screen flex flex-col">
+    <header class="shadow-md bg-blue-950">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <nav class="flex space-x-6">
+            <router-link to="/" class="text-white hover:text-blue-300 font-medium">投票首頁</router-link>
+            <router-link to="/manage" class="text-white hover:text-blue-300 font-medium">後台控制</router-link>
+          </nav>
+        </div>
+      </div>
+    </header>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+    <router-view class="flex-1" />
+
+    <footer class="shadow-md bg-blue-950">
+      <div class="container mx-auto px-4 py-4">
+      </div>
+    </footer>
+  </div>
+</template>
