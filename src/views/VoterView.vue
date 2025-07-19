@@ -94,7 +94,7 @@ const addVote = async (id) => {
     toastr.success("投票成功");
   } catch (error) {
     console.error("投票失敗:", error);
-    toastr.error("投票失敗");
+    toastr.error("投票失敗" + JSON.stringify(error.response.data.message));
   }
 };
 </script>

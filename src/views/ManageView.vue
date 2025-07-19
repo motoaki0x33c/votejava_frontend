@@ -93,7 +93,7 @@ const addVoteItem = async () => {
     toastr.success("新增成功");
   } catch (error) {
     console.error("新增失敗:", error);
-    toastr.error("新增失敗");
+    toastr.error("新增失敗" + JSON.stringify(error.response.data.message));
   }
 };
 
@@ -106,7 +106,7 @@ const updateVoteItem = async (voteItem) => {
     toastr.success("修改成功");
   } catch (error) {
     console.error("修改失敗:", error);
-    toastr.error("修改失敗");
+    toastr.error("修改失敗:" + JSON.stringify(error.response.data.message));
   }
 };
 
