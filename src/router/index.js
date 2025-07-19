@@ -4,6 +4,9 @@ const routes = [
   {
     path: '',
     component: () => import('../views/VoterView.vue')
+  }, {
+    path: '/manage',
+    component: () => import('../views/ManageView.vue')
   },
 ]
 

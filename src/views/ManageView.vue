@@ -2,15 +2,15 @@
   <div>
     <div class="flex flex-col w-3/4 m-auto">
       <div class="w-full max-w-sm min-w-[200px] relative mt-4">
-        <label class="block mb-2 text-sm text-slate-600"> 投票人姓名 </label>
+        <label class="block mb-2 text-sm text-slate-600"> 新增投票 </label>
         <div class="relative">
-          <input type="text" v-model="voter"
+          <input type="text" v-model="newVoteName"
             class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-20 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow disabled:cursor-not-allowed"
-            placeholder="請輸入投票人姓名" :disabled="voterLocked" />
+            placeholder="請輸入投票內容" />
           <button type="button"
             class="absolute right-1 top-1 rounded bg-slate-800 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
-            @click="lockVoter()" :disabled="voterLocked">
-            確認
+            @click="addVoteItem()">
+            新增
           </button>
         </div>
       </div>
@@ -33,7 +33,9 @@
               <tbody>
                 <tr v-for="voteItem in voteItems" class="odd:bg-white even:bg-gray-100 hover:bg-gray-100">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                    {{ voteItem.name }}
+                    <input type="text" v-model="voteItem.name"
+                      class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-20 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow disabled:cursor-not-allowed"
+                      placeholder="請輸入投票內容" />
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                     {{ voteItem.count }}
@@ -41,8 +43,13 @@
                   <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                     <button type="button"
                       class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                      @click="addVote(voteItem.id)" :disabled="!voterLocked">
-                      投票
+                      @click="updateVoteItem(voteItem)">
+                      變更名稱
+                    </button>
+                    <button type="button"
+                      class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none ml-2"
+                      @click="deleteVoteItem(voteItem)">
+                      刪除
                     </button>
                   </td>
                 </tr>
@@ -57,12 +64,11 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import voterApi from "@/api/VoterApi";
+import manageApi from "@/api/ManageVoteApi";
 import toastr from 'toastr'
 
 const voteItems = ref([]);
-const voter = ref('');
-const voterLocked = ref(false);
+const newVoteName = ref('');
 
 onMounted(() => {
   getVoteItems();
@@ -70,7 +76,7 @@ onMounted(() => {
 
 const getVoteItems = async () => {
   try {
-    const getVoteItems = await voterApi.getVoteItems();
+    const getVoteItems = await manageApi.getVoteItems();
     voteItems.value = getVoteItems.data;
   } catch (error) {
     console.error("獲取數據失敗:", error);
@@ -78,23 +84,40 @@ const getVoteItems = async () => {
   }
 };
 
-const lockVoter = () => {
-  if (voter.value == '') {
-    toastr.warning("請輸入投票人姓名");
-  } else {
-    voterLocked.value = true;
-    toastr.info("已確認投票人姓名，可進行投票");
+const addVoteItem = async () => {
+  if (newVoteName.value == '') return toastr.warning("請輸入新增的投票內容");
+
+  try {
+    await manageApi.addVoteItem(newVoteName.value);
+    getVoteItems();
+    toastr.success("新增成功");
+  } catch (error) {
+    console.error("新增失敗:", error);
+    toastr.error("新增失敗");
   }
 };
 
-const addVote = async (id) => {
+const updateVoteItem = async (voteItem) => {
+  if (voteItem.name == '') return toastr.warning("請輸入修改的投票內容");
+
   try {
-    await voterApi.addVote(id, voter.value);
+    await manageApi.updateVoteItem(voteItem.id, voteItem.name);
     getVoteItems();
-    toastr.success("投票成功");
+    toastr.success("修改成功");
   } catch (error) {
-    console.error("投票失敗:", error);
-    toastr.error("投票失敗");
+    console.error("修改失敗:", error);
+    toastr.error("修改失敗");
+  }
+};
+
+const deleteVoteItem = async (voteItem) => {
+  try {
+    await manageApi.deleteVoteItem(voteItem.id);
+    getVoteItems();
+    toastr.success("刪除成功");
+  } catch (error) {
+    console.error("刪除失敗:", error);
+    toastr.error("刪除失敗");
   }
 };
 </script>
